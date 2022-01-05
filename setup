@@ -1,0 +1,48 @@
+Adding  another Master to existing one
+kubeadm init --control-plane-endpoint=mngr2.kube.buildlab.in --pod-network-cidr=10.244.0.0/16 --upload-certs 
+
+OUTPUT:
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+You can now join any number of the control-plane node running the following command on each as root:
+
+  kubeadm join mngr2.kube.buildlab.in:6443 --token 54coq7.zrbkoh8g95fgzd3s \
+        --discovery-token-ca-cert-hash sha256:d0bda283fb290583f9a3801c78bcf0b090b32fa7567162ddbbac07fc39eb4145 \
+        --control-plane --certificate-key 14689cf38a89354279c0b9b595e84fb0cc3c7c2dfe19e398fc644a7fc0c18610
+
+Please note that the certificate-key gives access to cluster sensitive data, keep it secret!
+As a safeguard, uploaded-certs will be deleted in two hours; If necessary, you can use
+"kubeadm init phase upload-certs --upload-certs" to reload certs afterward.
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join mngr2.kube.buildlab.in:6443 --token 54coq7.zrbkoh8g95fgzd3s \
+        --discovery-token-ca-cert-hash sha256:d0bda283fb290583f9a3801c78bcf0b090b32fa7567162ddbbac07fc39eb4145 
+[root@mngr2 cni]# mkdir -p $HOME/.kube
+[root@mngr2 cni]# sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+cp: overwrite ‘/root/.kube/config’? y
+[root@mngr2 cni]# sudo chown $(id -u):$(id -g) $HOME/.kube/confi
+chown: cannot access ‘/root/.kube/confi’: No such file or directory
+[root@mngr2 cni]# chown $(id -u):$(id -g) $HOME/.kube/config
+[root@mngr2 cni]# kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+Warning: policy/v1beta1 PodSecurityPolicy is deprecated in v1.21+, unavailable in v1.25+
+podsecuritypolicy.policy/psp.flannel.unprivileged created
+clusterrole.rbac.authorization.k8s.io/flannel created
+clusterrolebinding.rbac.authorization.k8s.io/flannel created
+serviceaccount/flannel created
+configmap/kube-flannel-cfg created
+daemonset.apps/kube-flannel-ds created
